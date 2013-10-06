@@ -18,7 +18,9 @@ T_MIN = getattr(settings, 'TAGCLOUD_MIN', 1.0)
 register = template.Library()
 
 def get_queryset(forvar=None, taggeditem_model, tag_model):
-    count_field = None
+    through_opts = taggeditem_model._meta
+    count_field = ("%s_%s_items" % (through_opts.app_label,
+                    through_opts.object_name)).lower()
 
     if forvar is None:
         # get all tags
@@ -51,20 +53,8 @@ def get_queryset(forvar=None, taggeditem_model, tag_model):
             model_class = get_model(applabel, model)
             manager = getattr(model_class, manager_attr)
             queryset = manager.all()
-            through_opts = manager.through._meta
-            count_field = ("%s_%s_items" % (through_opts.app_label,
-                    through_opts.object_name)).lower()
 
-    if count_field is None:
-        # Retain compatibility with older versions of Django taggit
-        # a version check (for example taggit.VERSION <= (0,8,0)) does NOT
-        # work because of the version (0,8,0) of the current dev version of django-taggit
-        try:
-            return queryset.annotate(num_times=Count(settings.TAG_FIELD_RELATED_NAME))
-        except FieldError:
-            return queryset.annotate(num_times=Count('taggit_taggeditem_items'))
-    else:
-        return queryset.annotate(num_times=Count(count_field))
+    return queryset.annotate(num_times=Count(count_field))
 
 
 def get_weight_fun(t_min, t_max, f_min, f_max):
@@ -124,7 +114,7 @@ def get_tagcloud(context, asvar, forvar=None, limit=None, taggeditem_model=Tagge
     Optional([Constant('for'), Model()]),
     Optional([Constant('taggeditem_model'), Model()])
 ])
-def get_similar_objects(context, tovar, asvar, forvar=None, taggeditem_model=TaggedItem, tag_model=Tag):
+def get_similar_objects(context, tovar, asvar, forvar=None, taggeditem_model=TaggedItem):
     if forvar:
         assert hasattr(tovar, 'tags')
         tags = tovar.tags.all()
