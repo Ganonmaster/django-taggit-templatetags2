@@ -4,7 +4,9 @@ from django.db.models import Count
 from django.db.models.loading import get_model, cache
 from django.core.exceptions import FieldError
 
+from classytags.core import Options
 from classytags.arguments import Argument
+from classytags.helpers import AsTag
 
 from taggit import VERSION as TAGGIT_VERSION
 from taggit.managers import TaggableManager
@@ -81,68 +83,84 @@ def get_weight_fun(t_min, t_max, f_min, f_max):
             mult_fac = float(t_max-t_min)/float(f_max-f_min)
         return t_max - (f_max-f_i)*mult_fac
     return weight_fun
+     
+class TaggitBaseTag(AsTag):
 
-@tag(register,[
-    Constant('as'), Name(), 
-    Optional([Constant('for'), Variable()]), 
-    Optional([Constant('limit'), Variable()]),
-    Optional([Constant('taggeditem_model'), Model()]),
-    Optional([Constant('tag_model'), Model()])
-])
-def get_taglist(context, asvar, forvar=None, limit=10, taggeditem_model=TaggedItem, tag_model=Tag):
-    queryset = get_queryset(forvar, taggeditem, tag)        
-    queryset = queryset.order_by('-num_times')        
-    context[asvar] = queryset
-    if limit:
-        queryset = queryset[:limit]
-    return ''
+    options = Options(
+        'as',
+        Argument('varname', resolve=False, required=False),
+        'for',
+        Argument('forvar', required=False),
+        'limit',
+        Argument('limit', required=False, default=10),
+        'taggeditem_model',
+        ModelArgument('taggeditem_model', required=False, default=TaggedItem),
+        'tag_model',
+        ModelArgument('tag_model', required=False, default=Tag)
+    )
+    
+@register.tag   
+class GetTagList(TaggitBaseTag):
+    name = 'get_taglist'
+    
+    def get_value(self, context, forvar, limit, taggeditem_model, tag_model):
+        queryset = get_queryset(forvar, taggeditem_model, tag_model)        
+        queryset = queryset.order_by('-num_times')        
+        context[asvar] = queryset
+        if limit:
+            queryset = queryset[:limit]
+        return ''
 
-@tag(register, [
-    Constant('as'), Name(),
-    Optional([Constant('for'), Variable()]),
-    Optional([Constant('limit'), Variable()]),
-    Optional([Constant('taggeditem_model'), Model()]),
-    Optional([Constant('tag_model'), Model()])
-])
-def get_tagcloud(context, asvar, forvar=None, limit=None, taggeditem_model=TaggedItem, tag_model=Tag):
-    queryset = get_queryset(forvar, taggeditem, tag)
-    num_times = queryset.values_list('num_times', flat=True)
-    if(len(num_times) == 0):
+@register.tag   
+class GetTagCloud(TaggitBaseTag):
+    name = 'get_tagcloud'
+
+    def get_value(self, context, forvar, limit, taggeditem_model, tag_model):
+        queryset = get_queryset(forvar, taggeditem_model, tag_model)
+        num_times = queryset.values_list('num_times', flat=True)
+        if(len(num_times) == 0):
+            context[asvar] = queryset
+            return ''
+        weight_fun = get_weight_fun(T_MIN, T_MAX, min(num_times), max(num_times))
+        queryset = queryset.order_by('name')
+        if limit:
+            queryset = queryset[:limit]
+        for tag in queryset:
+            tag.weight = weight_fun(tag.num_times)
         context[asvar] = queryset
         return ''
-    weight_fun = get_weight_fun(T_MIN, T_MAX, min(num_times), max(num_times))
-    queryset = queryset.order_by('name')
-    if limit:
-        queryset = queryset[:limit]
-    for tag in queryset:
-        tag.weight = weight_fun(tag.num_times)
-    context[asvar] = queryset
-    return ''
- 
+     
 # method from
 # https://github.com/dokterbob/django-taggit-templatetags/commit/fe893ac1c93d58cd122c621804f311430c93dc12  
 # {% get_similar_obects to product as similar_videos for metaphore.embeddedvideo %}
-@tag(register, [
-    Constant('to'), Variable(),
-    Constant('as'), Name(),
-    Optional([Constant('for'), Model()]),
-    Optional([Constant('taggeditem_model'), Model()])
-])
-def get_similar_objects(context, tovar, asvar, forvar=None, taggeditem_model=TaggedItem):
-    if forvar:
-        assert hasattr(tovar, 'tags')
-        tags = tovar.tags.all()
-        from django.contrib.contenttypes.models import ContentType
-        ct = ContentType.objects.get_for_model(forvar)
-        items = taggeditem_model.objects.filter(content_type=ct, tag__in=tags)
-        from django.db.models import Count
-        ordered = items.values('object_id').annotate(Count('object_id')).order_by()
-        ordered_ids = map(lambda x: x['object_id'], ordered)
-        objects = ct.model_class().objects.filter(pk__in=ordered_ids)
-    else:
-        objects = tovar.tags.similar_objects()
-    context[asvar] = objects    
-    return ''    
+@register.tag
+class GetSimilarObjects(AsTag):
+    name = 'get_similar_objects'
+    options = Options(
+        'to',
+        Argument('to', resolve=False, required=False),
+        'as',
+        Argument('varname', required=False),
+        'for',
+        Argument('forvar', required=False),
+        'taggeditem_model',
+        ModelArgument('taggeditem_model', required=False, default=TaggedItem)
+    )
+    def get_value(self, context, tovar, asvar, forvar, taggeditem_model):
+        if forvar:
+            assert hasattr(tovar, 'tags')
+            tags = tovar.tags.all()
+            from django.contrib.contenttypes.models import ContentType
+            ct = ContentType.objects.get_for_model(forvar)
+            items = taggeditem_model.objects.filter(content_type=ct, tag__in=tags)
+            from django.db.models import Count
+            ordered = items.values('object_id').annotate(Count('object_id')).order_by()
+            ordered_ids = map(lambda x: x['object_id'], ordered)
+            objects = ct.model_class().objects.filter(pk__in=ordered_ids)
+        else:
+            objects = tovar.tags.similar_objects()
+        context[asvar] = objects    
+        return ''    
 
     
 def include_tagcloud(forvar=None):
