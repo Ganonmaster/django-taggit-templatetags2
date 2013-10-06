@@ -1,11 +1,10 @@
 from django import template
 from django.db import models
 from django.db.models import Count
-from django.db.models.loading import get_model
+from django.db.models.loading import get_model, cache
 from django.core.exceptions import FieldError
 
-from templatetag_sugar.register import tag
-from templatetag_sugar.parser import Name, Variable, Constant, Optional, Model
+from classytags.arguments import Argument
 
 from taggit import VERSION as TAGGIT_VERSION
 from taggit.managers import TaggableManager
@@ -17,6 +16,21 @@ T_MIN = getattr(settings, 'TAGCLOUD_MIN', 1.0)
 
 register = template.Library()
 
+class ModelResolver(object):
+    def __init__(self, real):
+        self.real = real
+
+    def resolve(self, context):
+        value = self.real.resolve(context)
+        app, model = value.split(".")
+        return cache.get_model(app, model)
+
+
+class ModelArgument(Argument):
+    def parse_token(self, parser, token):
+        real = super(ModelArgument, self).parse_token(parser, token)
+        return ModelResolver(real)
+        
 def get_queryset(forvar=None, taggeditem_model, tag_model):
     through_opts = taggeditem_model._meta
     count_field = ("%s_%s_items" % (through_opts.app_label,
