@@ -17,12 +17,12 @@ T_MIN = getattr(settings, 'TAGCLOUD_MIN', 1.0)
 
 register = template.Library()
 
-def get_queryset(forvar=None):
+def get_queryset(forvar=None, taggeditem_model, tag_model):
     count_field = None
 
     if forvar is None:
         # get all tags
-        queryset = settings.TAG_MODEL.objects.all()
+        queryset = tag_model.objects.all()
     else:
         # extract app label and model name
         beginning, applabel, model = None, None, None
@@ -38,9 +38,9 @@ def get_queryset(forvar=None):
         # filter tagged items        
         if model is None:
             # Get tags for a whole app
-            queryset = settings.TAGGED_ITEM_MODEL.objects.filter(content_type__app_label=applabel)
+            queryset = taggeditem_model.objects.filter(content_type__app_label=applabel)
             tag_ids = queryset.values_list('tag_id', flat=True)
-            queryset = settings.TAG_MODEL.objects.filter(id__in=tag_ids)
+            queryset = tag_model.objects.filter(id__in=tag_ids)
         else:
             # Get tags for a model
             model = model.lower()
@@ -78,21 +78,30 @@ def get_weight_fun(t_min, t_max, f_min, f_max):
         return t_max - (f_max-f_i)*mult_fac
     return weight_fun
 
-@tag(register,[Constant('as'), Name(), 
-               Optional([Constant('for'), Variable()]), 
-               Optional([Constant('limit'), Variable()])
-               ])
-def get_taglist(context, asvar, forvar=None, limit=10):
-    queryset = get_queryset(forvar)         
+@tag(register,[
+    Constant('as'), Name(), 
+    Optional([Constant('for'), Variable()]), 
+    Optional([Constant('limit'), Variable()]),
+    Optional([Constant('taggeditem_model'), Model()]),
+    Optional([Constant('tag_model'), Model()])
+])
+def get_taglist(context, asvar, forvar=None, limit=10, taggeditem_model=TaggedItem, tag_model=Tag):
+    queryset = get_queryset(forvar, taggeditem, tag)        
     queryset = queryset.order_by('-num_times')        
     context[asvar] = queryset
     if limit:
         queryset = queryset[:limit]
     return ''
 
-@tag(register, [Constant('as'), Name(), Optional([Constant('for'), Variable()]), Optional([Constant('limit'), Variable()]),])
-def get_tagcloud(context, asvar, forvar=None, limit=None):
-    queryset = get_queryset(forvar)
+@tag(register, [
+    Constant('as'), Name(),
+    Optional([Constant('for'), Variable()]),
+    Optional([Constant('limit'), Variable()]),
+    Optional([Constant('taggeditem_model'), Model()]),
+    Optional([Constant('tag_model'), Model()])
+])
+def get_tagcloud(context, asvar, forvar=None, limit=None, taggeditem_model=TaggedItem, tag_model=Tag):
+    queryset = get_queryset(forvar, taggeditem, tag)
     num_times = queryset.values_list('num_times', flat=True)
     if(len(num_times) == 0):
         context[asvar] = queryset
@@ -109,14 +118,19 @@ def get_tagcloud(context, asvar, forvar=None, limit=None):
 # method from
 # https://github.com/dokterbob/django-taggit-templatetags/commit/fe893ac1c93d58cd122c621804f311430c93dc12  
 # {% get_similar_obects to product as similar_videos for metaphore.embeddedvideo %}
-@tag(register, [Constant('to'), Variable(), Constant('as'), Name(), Optional([Constant('for'), Model()])])
-def get_similar_objects(context, tovar, asvar, forvar=None):
+@tag(register, [
+    Constant('to'), Variable(),
+    Constant('as'), Name(),
+    Optional([Constant('for'), Model()]),
+    Optional([Constant('taggeditem_model'), Model()])
+])
+def get_similar_objects(context, tovar, asvar, forvar=None, taggeditem_model=TaggedItem, tag_model=Tag):
     if forvar:
         assert hasattr(tovar, 'tags')
         tags = tovar.tags.all()
         from django.contrib.contenttypes.models import ContentType
         ct = ContentType.objects.get_for_model(forvar)
-        items = TaggedItem.objects.filter(content_type=ct, tag__in=tags)
+        items = taggeditem_model.objects.filter(content_type=ct, tag__in=tags)
         from django.db.models import Count
         ordered = items.values('object_id').annotate(Count('object_id')).order_by()
         ordered_ids = map(lambda x: x['object_id'], ordered)
