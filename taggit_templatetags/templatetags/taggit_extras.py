@@ -1,7 +1,6 @@
 from django import template
 from django.db import models
 from django.db.models import Count
-from django.db.models.loading import get_model, cache
 from django.core.exceptions import FieldError
 
 from classytags.core import Options
@@ -18,21 +17,6 @@ T_MIN = getattr(settings, 'TAGCLOUD_MIN', 1.0)
 
 register = template.Library()
 
-class ModelResolver(object):
-    def __init__(self, real):
-        self.real = real
-
-    def resolve(self, context):
-        value = self.real.resolve(context)
-        app, model = value.split(".")
-        return cache.get_model(app, model)
-
-
-class ModelArgument(Argument):
-    def parse_token(self, parser, token):
-        real = super(ModelArgument, self).parse_token(parser, token)
-        return ModelResolver(real)
-        
 def get_queryset(forvar=None, taggeditem_model, tag_model):
     through_opts = taggeditem_model._meta
     count_field = ("%s_%s_items" % (through_opts.app_label,
@@ -92,11 +76,7 @@ class TaggitBaseTag(AsTag):
         'for',
         Argument('forvar', required=False),
         'limit',
-        Argument('limit', required=False, default=10),
-        'taggeditem_model',
-        ModelArgument('taggeditem_model', required=False, default=TaggedItem),
-        'tag_model',
-        ModelArgument('tag_model', required=False, default=Tag)
+        Argument('limit', required=False, default=10
     )
     
 @register.tag   
@@ -134,17 +114,14 @@ class GetTagCloud(TaggitBaseTag):
 # https://github.com/dokterbob/django-taggit-templatetags/commit/fe893ac1c93d58cd122c621804f311430c93dc12  
 # {% get_similar_obects to product as similar_videos for metaphore.embeddedvideo %}
 @register.tag
-class GetSimilarObjects(AsTag):
+class BaseGetSimilarObjects(AsTag):
+    for_model = None
     name = 'get_similar_objects'
     options = Options(
         'to',
         Argument('to', resolve=False, required=False),
         'as',
-        Argument('varname', required=False),
-        'for',
-        Argument('forvar', required=False),
-        'taggeditem_model',
-        ModelArgument('taggeditem_model', required=False, default=TaggedItem)
+        Argument('varname', required=False)
     )
     def get_value(self, context, tovar, asvar, forvar, taggeditem_model):
         if forvar:
