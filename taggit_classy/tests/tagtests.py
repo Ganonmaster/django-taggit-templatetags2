@@ -2,11 +2,11 @@ from django.test import TestCase
 from django.template import Context, Template
 from django.template.loader import get_template
 
-from taggit_templatetags.tests.models import (AlphaModel, BetaModel,
+from taggit_classy.tests.models import (AlphaModel, BetaModel,
         CharPkModel, AnotherCharPkModel)
 from taggit.tests.tests import BaseTaggingTest
 
-from taggit_templatetags.templatetags.taggit_extras import get_weight_fun
+from taggit_classy.templatetags.taggit_extras import get_weight_fun
 
 class SetUpTestCase():
     a_model = AlphaModel
@@ -122,37 +122,37 @@ class TemplateTagCloudTestCase(SetUpTestCase, BaseTaggingTest, TestCase):
         
 class TemplateInclusionTagTest(SetUpTestCase, TestCase, BaseTaggingTest):    
     def test_taglist_project(self):
-        t = get_template('taggit_templatetags/taglist_include.html')
+        t = get_template('taggit_classy/taglist_include.html')
         c = Context({'forvar': None})
         t.render(c)
         self.assert_tags_equal(c.get("tags"), ["sweet", "green", "yellow", "fresh", "sour"], False)
                 
     def test_taglist_app(self):
-        t = get_template('taggit_templatetags/taglist_include.html')
+        t = get_template('taggit_classy/taglist_include.html')
         c = Context({'forvar': 'tests'})
         t.render(c)
         self.assert_tags_equal(c.get("tags"), ["sweet", "green", "yellow", "fresh", "sour"], False)
             
     def test_taglist_model(self):
-        t = get_template('taggit_templatetags/taglist_include.html')
+        t = get_template('taggit_classy/taglist_include.html')
         c = Context({'forvar': 'tests.BetaModel'})
         t.render(c)
         self.assert_tags_equal(c.get("tags"), ["sweet", "green", "yellow"], False)
         
     def test_tagcloud_project(self):
-        t = get_template('taggit_templatetags/tagcloud_include.html')
+        t = get_template('taggit_classy/tagcloud_include.html')
         c = Context({'forvar': None})
         t.render(c)
         self.assert_tags_equal(c.get("tags"), ["fresh", "green", "sour", "sweet", "yellow"], False)
     
     def test_tagcloud_app(self):
-        t = get_template('taggit_templatetags/tagcloud_include.html')
+        t = get_template('taggit_classy/tagcloud_include.html')
         c = Context({'forvar': 'tests'})
         t.render(c)
         self.assert_tags_equal(c.get("tags"), ["fresh", "green", "sour", "sweet", "yellow"], False)
     
     def test_tagcloud_model(self):
-        t = get_template('taggit_templatetags/tagcloud_include.html')
+        t = get_template('taggit_classy/tagcloud_include.html')
         c = Context({'forvar': 'tests.BetaModel'})
         t.render(c)
         self.assert_tags_equal(c.get("tags"), ["green", "sweet", "yellow"], False)
@@ -168,7 +168,7 @@ class AlphaPathologicalCaseTestCase(TestCase, BaseTaggingTest):
         a1.tags.add("green")
         
     def test_tagcloud(self):
-        t = get_template('taggit_templatetags/tagcloud_include.html')
+        t = get_template('taggit_classy/tagcloud_include.html')
         c = Context({'forvar': None})
         t.render(c)
         self.assert_tags_equal(c.get("tags"), ["green"], False)
@@ -191,7 +191,7 @@ class BetaPathologicalCaseTestCase(TestCase, BaseTaggingTest):
         b1.tags.add("green")
         
     def test_tagcloud(self):
-        t = get_template('taggit_templatetags/tagcloud_include.html')
+        t = get_template('taggit_classy/tagcloud_include.html')
         c = Context({'forvar': None})
         t.render(c)
         self.assert_tags_equal(c.get("tags"), ["green"], False)
@@ -210,7 +210,7 @@ class GammaPathologicalCaseTestCase(TestCase, BaseTaggingTest):
         b1 = self.b_model.objects.create(name="dog")
         
     def test_tagcloud(self):
-        t = get_template('taggit_templatetags/tagcloud_include.html')
+        t = get_template('taggit_classy/tagcloud_include.html')
         c = Context({'forvar': None})
         t.render(c)
         self.assert_tags_equal(c.get("tags"), [], False)
@@ -229,13 +229,13 @@ class CustomThroughModelTestCase(TestCase, BaseTaggingTest):
         a2.ttaaggss.add("orange")
 
     def test_default_tags_name(self):
-        t = get_template('taggit_templatetags/tagcloud_include.html')
+        t = get_template('taggit_classy/tagcloud_include.html')
         c = Context({'forvar': 'tests.CharPkModel'})
         t.render(c)
         self.assert_tags_equal(c.get("tags"), ["blue", "green"], False)
 
     def test_custom_tags_name(self):
-        t = get_template('taggit_templatetags/tagcloud_include.html')
+        t = get_template('taggit_classy/tagcloud_include.html')
         c = Context({'forvar': 'tests.AnotherCharPkModel:ttaaggss'})
         t.render(c)
         self.assert_tags_equal(c.get("tags"), ["orange", "yellow"], False)

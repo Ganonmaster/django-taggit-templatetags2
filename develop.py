@@ -8,7 +8,7 @@ settings = dict(
         'django.contrib.contenttypes',
         'taggit',
         'taggit_classy',
-        'taggit_classy.tests'       
+        'taggit_classy_testapp'       
     ]
 )
 
