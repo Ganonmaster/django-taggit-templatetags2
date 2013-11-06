@@ -1,29 +1,18 @@
 #!/usr/bin/env python
+from djeasytests.testsetup import TestSetup
 
-import sys
-from os.path import dirname, abspath
-from django.conf import settings
+settings = dict(
+    DEBUG=True,
+    SITE_ID=1,
+    INSTALLED_APPS = [
+        'django.contrib.contenttypes',
+        'taggit',
+        'taggit_classy',
+        'taggit_classy.tests'       
+    ]
+)
 
-if not settings.configured:
-    settings.configure(
-        DATABASE_ENGINE='sqlite3',
-        INSTALLED_APPS=[
-            'django.contrib.contenttypes',
-            'taggit',
-            'taggit_templatetags',
-            'taggit_templatetags.tests'            
-        ]
-    )
-
-from django.test.simple import run_tests
-
-def runtests(*test_args):
-    if not test_args:
-        test_args = ['tests']
-    parent = dirname(abspath(__file__))
-    sys.path.insert(0, parent)
-    failures = run_tests(test_args, verbosity=1, interactive=True)
-    sys.exit(failures)
+testsetup = TestSetup(appname='taggit_classy', test_settings=settings)
 
 if __name__ == '__main__':
-    runtests(*sys.argv[1:])
+    testsetup.run(__file__)
