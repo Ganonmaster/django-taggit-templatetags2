@@ -34,7 +34,7 @@ setup(
     keywords='django taggit tags tagcloud taglist tagging tag',
     author='Wojciech Banas',
     author_email='fizista@gmail.com',
-    url='http://github.com/feuervogel/django-taggit-templatetags2',
+    url='https://github.com/fizista/django-taggit-templatetags2',
     license='BSD',
     packages=find_packages(),
     include_package_data=False,
