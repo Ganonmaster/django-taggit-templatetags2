@@ -1,3 +1,5 @@
-include *.rst
 include *.txt
-recursive-include taggit_templatetags/templates/taggit_templatetags/ *.html
+include *.rst
+recursive-include taggit_templatetags2/templates *.html
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
