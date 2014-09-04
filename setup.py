@@ -40,7 +40,7 @@ setup(
     include_package_data=False,
     package_data={
         # If any package contains *.txt or *.rst files, include them:
-             '': ['*.txt', '*.xml', '*.html'],
+        'taggit_templatetags2': ['templates/*.html', 'templates/taggit_templatetags2/*.html'],
     },
     zip_safe=False,
     install_requires=[
