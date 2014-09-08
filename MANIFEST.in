@@ -2,5 +2,6 @@ include *.txt
 include *.rst
 recursive-include taggit_templatetags2/templates *
 recursive-include taggit_templatetags2/static *
+recursive-include taggit_templatetags2/static/taggit_templatetags2 *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

@@ -118,7 +118,7 @@ of a model, just do::
 
    {% include_tagcloud 'yourapp.yourmodel' %}
 
-TagCanvas is a Javascript class which will draw and animate a HTML5  canvas 
+TagCanvas_ is a Javascript class which will draw and animate a HTML5  canvas 
 based tag cloud.  You can use this library in your application as follows::
 
    {% include_tagcanvas 'element_id' 'width px' 'height px' 'some-url-name' 'yourapp.yourmodel' %}
@@ -217,3 +217,4 @@ Thanks to `Mathijs de Bruin`_ as well for his helpful pull requests.
 .. _Alex Gaynor: http://alexgaynor.net/
 .. _Mathijs de Bruin: http://github.com/dokterbob
 .. _Custom Tagging: http://django-taggit.readthedocs.org/en/latest/custom_tagging.html
+.. _TagCanvas: http://www.goat1000.com/tagcanvas.php
