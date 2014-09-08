@@ -37,6 +37,14 @@ In your templates, you need to load ``taggit_templatetags2_tags``::
     {% load taggit_templatetags2_tags %}
     ... 
 
+---------
+Tagdetail
+---------
+
+List of tags for the selected object::
+
+   {% get_tags_for_object <some_model_object or id> as "tags" %}
+
 --------
 Taglists
 --------
@@ -68,7 +76,7 @@ You can now iterate over it::
     {% for tag in tags %}
     <li>{{tag}} ({{tag.num_times}})</li>
     {% endfor %} 
-    <ul>
+    </ul>
     
 As you can see, each tag has an attribute ``num_times`` which declares how many 
 times it was used. The list of tags is sorted descending by ``num_times``.
@@ -108,7 +116,43 @@ Inclusion-Tag
 Even for the tagcloud there's an inclusion-tag. For example, for a tagcloud 
 of a model, just do::
 
-{% include_tagcloud 'yourapp.yourmodel' %}
+   {% include_tagcloud 'yourapp.yourmodel' %}
+
+TagCanvas is a Javascript class which will draw and animate a HTML5  canvas 
+based tag cloud.  You can use this library in your application as follows::
+
+   {% include_tagcanvas 'element_id' 'width px' 'height px' 'some-url-name' 'yourapp.yourmodel' %}
+
+- element_id - name to create identifiers for html tags
+- some-url-name -  url to view a list of objects for the selected tag. Default: *tagcanvas-list*.
+   For example, some-url-name='myurlname', then it must be an entry in urls.py 
+   file like this::
+   
+   from taggit_templatetags2.views import TagCanvasListView
+   
+   urlpatterns = patterns(
+       ...
+       url(r'^tag-list/(?P<tag_id>.*)/(?P<tag_slug>.*)/',
+           TagCanvasListView.as_view(), name='myurlname'),
+   )
+   
+Or you can use the default view, and then you have to add the following things:
+
+- in urls.py::
+   
+   from taggit_templatetags2 import urls as taggit_templatetags2_urls
+   urlpatterns = patterns(
+       ...
+       url(r'^tags/', include('taggit_templatetags2.urls')),
+   )
+
+- override template "taggit_templatetags2/tagcanvas_base.html" and
+- override template "taggit_templatetags2/tagcanvas_list_item.html" to customize the look
+   
+To use this inclusion-tag, make sure that 'django.core.context_processors.static' 
+appears somewhere in your TEMPLATE_CONTEXT_PROCESSORS setting.
+
+
 
 .. _settings:
 

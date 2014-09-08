@@ -28,7 +28,6 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python',
         'Framework :: Django',
     ],  # strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
     keywords='django taggit tags tagcloud taglist tagging tag',
@@ -40,7 +39,10 @@ setup(
     include_package_data=False,
     package_data={
         # If any package contains *.txt or *.rst files, include them:
-        'taggit_templatetags2': ['templates/*.html', 'templates/taggit_templatetags2/*.html'],
+        'taggit_templatetags2': [
+            'templates/*.html',
+            'templates/taggit_templatetags2/*.html',
+            'static/*'],
     },
     zip_safe=False,
     install_requires=[

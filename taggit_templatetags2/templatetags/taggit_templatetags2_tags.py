@@ -54,6 +54,10 @@ def get_queryset(forvar, taggeditem_model, tag_model):
             else:
                 manager_attr = "tags"
             model_class = get_model(applabel, model)
+            if not model_class:
+                raise Exception(
+                    'Not found such a model "%s" in the application "%s"' %
+                    (model, applabel))
             manager = getattr(model_class, manager_attr)
             queryset = manager.all()
             through_opts = manager.through._meta
@@ -85,6 +89,42 @@ def get_weight_fun(t_min, t_max, f_min, f_max):
             mult_fac = float(t_max - t_min) / float(f_max - f_min)
         return t_max - (f_max - f_i) * mult_fac
     return weight_fun
+
+
+@register.tag
+class GetTagForObject(AsTag):
+
+    name = 'get_tags_for_object'
+
+    options = Options(
+        Argument('surce_object', resolve=True, required=True),
+        'as',
+        Argument('varname', resolve=False, required=False),
+    )
+
+    def get_value(self, context, surce_object, varname=''):
+        """
+        Args:
+            surce_object - <int> or <django model object>
+
+        Return:
+            queryset tags
+        """
+
+        tag_model = settings.TAG_MODEL
+
+        try:
+            tags = tag_model.objects.filter(
+                taggit_taggeditem_items__object_id=surce_object)
+        except:
+            tags = tag_model.objects.filter(
+                taggit_taggeditem_items__object_id=surce_object.id)
+
+        if varname:
+            context[varname]
+            return ''
+        else:
+            return tags
 
 
 class TaggitBaseTag(AsTag):
@@ -149,3 +189,25 @@ def include_tagcloud(forvar=None):
 @register.inclusion_tag('taggit_templatetags2/taglist_include.html')
 def include_taglist(forvar=None):
     return {'forvar': forvar}
+
+
+@register.inclusion_tag('taggit_templatetags2/tagcanvas_include.html')
+def include_tagcanvas(element_id, width, height, url_name='tagcanvas-list',
+                      forvar=None):
+    """
+    Args:
+        element_id - str - html id
+        width - int - pixels width
+        height - int - pixels height
+        url_name - if url_name=='' then no links. Default: tagcanvas-list
+    """
+
+    if url_name == 'default':
+        url_name = 'tagcanvas-list'
+
+    return {
+        'forvar': forvar,
+        'element_id': element_id,
+        'width': width,
+        'height': height,
+        'url_name': url_name}
