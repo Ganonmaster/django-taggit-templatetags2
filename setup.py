@@ -42,7 +42,8 @@ setup(
         'taggit_templatetags2': [
             'templates/*.html',
             'templates/taggit_templatetags2/*.html',
-            'static/*'],
+            'static/*.*',
+            'static/taggit_templatetags2/*.*'],
     },
     zip_safe=False,
     install_requires=[
