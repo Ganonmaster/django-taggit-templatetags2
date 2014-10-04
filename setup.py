@@ -36,15 +36,13 @@ setup(
     url='https://github.com/fizista/django-taggit-templatetags2',
     license='BSD',
     packages=find_packages(),
-    include_package_data=False,
-    package_data={
-        # If any package contains *.txt or *.rst files, include them:
-        'taggit_templatetags2': [
-            'templates/*.html',
-            'templates/taggit_templatetags2/*.html',
-            'static/*.*',
-            'static/taggit_templatetags2/*.*'],
-    },
+    include_package_data=True,
+    #     package_data={
+    # If any package contains *.txt or *.rst files, include them:
+    #         'taggit_templatetags2': [
+    #             'templates/*',
+    #             'static/*',],
+    #     },
     zip_safe=False,
     install_requires=[
         'django >= 1.5',
