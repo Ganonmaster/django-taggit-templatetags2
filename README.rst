@@ -110,17 +110,24 @@ respectivly. The resulting list of tags is ordered by their ``name`` attribute.
 Besides the ``num_items`` attribute, there's a ``weight`` attribute. Its maximum 
 and minimum may be specified as the settings_ section reads.
 
-Inclusion-Tag
--------------
+Inclusion-Tag: tag cloud
+------------------------
 
 Even for the tagcloud there's an inclusion-tag. For example, for a tagcloud 
 of a model, just do::
 
    {% include_tagcloud 'yourapp.yourmodel' %}
 
+
+Inclusion-Tag: tag canvas
+-------------------------
+
 TagCanvas_ is a Javascript class which will draw and animate a HTML5  canvas 
 based tag cloud.  You can use this library in your application as follows::
 
+   <!-- Somewhere before the tag include_tagcanvas. For example, in the "head". -->
+   {% include "taggit_templatetags2/tagcanvas_include_js_static.html" %}
+   
    {% include_tagcanvas 'element_id' 'width px' 'height px' 'some-url-name' 'yourapp.yourmodel' %}
 
 - element_id - name to create identifiers for html tags

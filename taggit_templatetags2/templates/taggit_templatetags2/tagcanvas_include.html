@@ -1,16 +1,10 @@
-{% load static %}
 {% load taggit_templatetags2_tags %}
-
-{% get_static_prefix as STATIC_PREFIX %}
 
 {% if forvar %}
 	{% get_tagcloud as tags for forvar %}
 {% else %}
 	{% get_tagcloud as tags %}
 {% endif %}
-
-<!--[if lt IE 9]><script type="text/javascript" src="{{ STATIC_PREFIX }}/taggit_templatetags2/js/excanvas.compiled.js"></script><![endif]-->
-<script src="{{ STATIC_PREFIX }}taggit_templatetags2/js/tagcanvas.min.js" type="text/javascript"></script>
 
 <div id="{{ element_id }}">
 
@@ -41,17 +35,4 @@
 
 </div>
 
-<script type="text/javascript">
-window.onload = function() {
-  try {
-      TagCanvas.Start('{{ element_id }}_canvas', '{{ element_id }}_tags',{
-        reverse: true,
-        depth: 0.8,
-        maxSpeed: 0.05
-      });
-    } catch(e) {
-      // something went wrong, hide the canvas container
-    	document.getElementById('{{ element_id }}').style.display = 'none';
-    }
-};
-</script>
+{% include "taggit_templatetags2/tagcanvas_include_js.html" with element_id=element_id %}
