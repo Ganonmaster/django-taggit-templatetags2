@@ -15,3 +15,5 @@ TAGGED_ITEM_MODEL = \
 TAGGED_ITEM_MODEL = get_model(*TAGGED_ITEM_MODEL)
 TAG_FIELD_RELATED_NAME = \
     getattr(settings, 'TAGGIT_TAG_FIELD_RELATED_NAME', 'taggeditem_items')
+
+LIMIT = getattr(settings, 'TAGGIT_LIMIT', 10)

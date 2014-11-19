@@ -12,8 +12,6 @@ from taggit_templatetags2 import settings
 T_MAX = getattr(settings, 'TAGCLOUD_MAX', 6.0)
 T_MIN = getattr(settings, 'TAGCLOUD_MIN', 1.0)
 
-LIMIT = 10
-
 register = template.Library()
 
 
@@ -135,7 +133,7 @@ class TaggitBaseTag(AsTag):
         'for',
         Argument('forvar', required=False),
         'limit',
-        Argument('limit', required=False, default=LIMIT),
+        Argument('limit', required=False, default=5, resolve=True),
     )
 
 
@@ -143,7 +141,7 @@ class TaggitBaseTag(AsTag):
 class GetTagList(TaggitBaseTag):
     name = 'get_taglist'
 
-    def get_value(self, context, varname, forvar, limit=LIMIT):
+    def get_value(self, context, varname, forvar, limit=settings.LIMIT):
         # TODO: remove default value for limit, report a bug in the application
         # django-classy-tags, the default value does not work
         queryset = get_queryset(
@@ -161,7 +159,7 @@ class GetTagList(TaggitBaseTag):
 class GetTagCloud(TaggitBaseTag):
     name = 'get_tagcloud'
 
-    def get_value(self, context, varname, forvar, limit=LIMIT):
+    def get_value(self, context, varname, forvar, limit=settings.LIMIT):
         queryset = get_queryset(
             forvar,
             settings.TAGGED_ITEM_MODEL,
@@ -193,7 +191,7 @@ def include_taglist(forvar=None):
 
 @register.inclusion_tag('taggit_templatetags2/tagcanvas_include.html')
 def include_tagcanvas(element_id, width, height, url_name='tagcanvas-list',
-                      forvar=None):
+                      forvar=None, limit=3):
     """
     Args:
         element_id - str - html id
@@ -210,4 +208,5 @@ def include_tagcanvas(element_id, width, height, url_name='tagcanvas-list',
         'element_id': element_id,
         'width': width,
         'height': height,
-        'url_name': url_name}
+        'url_name': url_name,
+        'limit': limit}
