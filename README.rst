@@ -189,6 +189,10 @@ TAGGIT_TAG_MODEL = ('myapp','MyTag')
 TAGGIT_TAGGED_ITEM_MODEL = ('myapp','MyTaggedItem')
    default: ('taggit', 'TaggedItem')
 
+TAGGIT_LIMIT = 234
+   Number items for tag cloud.
+   default: 10
+
 Testing
 =======
 
