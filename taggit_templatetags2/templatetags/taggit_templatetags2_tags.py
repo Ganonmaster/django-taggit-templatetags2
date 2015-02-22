@@ -141,14 +141,14 @@ class TaggitBaseTag(AsTag):
 class GetTagList(TaggitBaseTag):
     name = 'get_taglist'
 
-    def get_value(self, context, varname, forvar, limit=settings.LIMIT):
+    def get_value(self, context, varname, forvar,order_by=settings.ORDER_BY, limit=settings.LIMIT):
         # TODO: remove default value for limit, report a bug in the application
         # django-classy-tags, the default value does not work
         queryset = get_queryset(
             forvar,
             settings.TAGGED_ITEM_MODEL,
             settings.TAG_MODEL)
-        queryset = queryset.order_by('-num_times')
+        queryset = queryset.order_by(order_by)
         context[varname] = queryset
         if limit:
             queryset = queryset[:limit]
@@ -159,7 +159,7 @@ class GetTagList(TaggitBaseTag):
 class GetTagCloud(TaggitBaseTag):
     name = 'get_tagcloud'
 
-    def get_value(self, context, varname, forvar, limit=settings.LIMIT):
+    def get_value(self, context, varname, forvar,order_by=settings.ORDER_BY, limit=settings.LIMIT):
         queryset = get_queryset(
             forvar,
             settings.TAGGED_ITEM_MODEL,
@@ -170,7 +170,7 @@ class GetTagCloud(TaggitBaseTag):
             return ''
         weight_fun = get_weight_fun(
             T_MIN, T_MAX, min(num_times), max(num_times))
-        queryset = queryset.order_by('name')
+        queryset = queryset.order_by(order_by)
         if limit:
             queryset = queryset[:limit]
         for tag in queryset:

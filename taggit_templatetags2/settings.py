@@ -17,3 +17,4 @@ TAG_FIELD_RELATED_NAME = \
     getattr(settings, 'TAGGIT_TAG_FIELD_RELATED_NAME', 'taggeditem_items')
 
 LIMIT = getattr(settings, 'TAGGIT_LIMIT', 10)
+ORDER_BY = getattr(settings, 'TAGGIT_ORDER_BY', '-num_times')
