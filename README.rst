@@ -193,9 +193,13 @@ TAGGIT_LIMIT = 234
    Number items for tag cloud.
    default: 10
 
-TAGGIT_ORDER_BY = 'name'
+TAGGIT_TAG_LIST_ORDER_BY = 'name'
    Order for the queryset used to generate the list.
    default: -num_times
+
+TAGGIT_TAG_CLOUD_ORDER_BY = '-num_times'
+   Order for the queryset used to generate the list.
+   default: name
 
 Testing
 =======
