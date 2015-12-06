@@ -177,6 +177,25 @@ class TemplateTagCloudTestCase(SetUpTestCase, BaseTaggingTest, TestCase):
         self.assertEqual(c.get("taglist")[2].weight, 1.0)
 
 
+class TemplateTagsForObjectTestCase(SetUpTestCase, BaseTaggingTest, TestCase):
+
+    def get_template(self, argument):
+        return """      {%% load taggit_templatetags2_tags %%}
+                        {%% get_tags_for_object %s as taglist %%}
+                """ % argument
+
+    def test_object(self):
+        a_objs = self.a_model.objects.filter(name='apple')
+        t = Template(self.get_template('object'))
+        c = Context({'object': a_objs[0]})
+        t.render(c)
+        self.assert_tags_equal(
+            c.get("taglist"),
+            ["green", "sweet", "fresh"],
+            False)
+        
+        
+
 class TemplateInclusionTagTest(SetUpTestCase, TestCase, BaseTaggingTest):
 
     def test_taglist_project(self):

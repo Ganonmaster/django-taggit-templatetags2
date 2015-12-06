@@ -1,4 +1,5 @@
 from django import template
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
 from django.db.models.loading import get_model
 from django.core.exceptions import FieldError
@@ -95,28 +96,34 @@ class GetTagForObject(AsTag):
     name = 'get_tags_for_object'
 
     options = Options(
-        Argument('surce_object', resolve=True, required=True),
+        Argument('source_object', resolve=True, required=True),
         'as',
         Argument('varname', resolve=False, required=False),
     )
 
-    def get_value(self, context, surce_object, varname=''):
+    def get_value(self, context, source_object, varname=''):
         """
         Args:
-            surce_object - <int> or <django model object>
+            source_object - <int> or <django model object>
 
         Return:
             queryset tags
         """
 
         tag_model = settings.TAG_MODEL
+        app_label = source_object._meta.app_label
+        model = source_object._meta.model_name
+        content_type = ContentType.objects.get(app_label=app_label,
+                                               model=model)
 
         try:
             tags = tag_model.objects.filter(
-                taggit_taggeditem_items__object_id=surce_object)
+                taggit_taggeditem_items__object_id=source_object,
+                taggit_taggeditem_items__content_type=content_type)
         except:
             tags = tag_model.objects.filter(
-                taggit_taggeditem_items__object_id=surce_object.id)
+                taggit_taggeditem_items__object_id=source_object.id,
+                taggit_taggeditem_items__content_type=content_type)
 
         if varname:
             context[varname]
