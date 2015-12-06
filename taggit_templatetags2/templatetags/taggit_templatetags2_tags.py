@@ -1,7 +1,6 @@
 from django import template
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
-from django.db.models.loading import get_model
 from django.core.exceptions import FieldError
 
 from classytags.core import Options
@@ -9,6 +8,7 @@ from classytags.arguments import Argument
 from classytags.helpers import AsTag
 
 from taggit_templatetags2 import settings
+from taggit_templatetags2.compat import get_model
 
 T_MAX = getattr(settings, 'TAGCLOUD_MAX', 6.0)
 T_MIN = getattr(settings, 'TAGCLOUD_MIN', 1.0)
