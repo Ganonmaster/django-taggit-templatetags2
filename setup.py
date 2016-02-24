@@ -8,11 +8,7 @@ from taggit_templatetags2 import __version__ as VERSION
 
 __dir__ = realpath(dirname(__file__))
 
-TESTS_REQUIRE = [
-    'django-easytests >= 0.9.4',
-    'coverage >= 3.7',
-    'django-coverage >= 1.2',
-    'tox >= 1.7']
+TESTS_REQUIRE = ['tox >= 1.7']
 
 setup(
     name='django-taggit-templatetags2',

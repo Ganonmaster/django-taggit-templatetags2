@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.template import Context, Template
 from django.template.loader import get_template
 
-from testapp.models import (
+from test_project.testapp.models import (
     AlphaModel,
     BetaModel,
     CharPkModel,
@@ -193,8 +193,7 @@ class TemplateTagsForObjectTestCase(SetUpTestCase, BaseTaggingTest, TestCase):
             c.get("taglist"),
             ["green", "sweet", "fresh"],
             False)
-        
-        
+
 
 class TemplateInclusionTagTest(SetUpTestCase, TestCase, BaseTaggingTest):
 

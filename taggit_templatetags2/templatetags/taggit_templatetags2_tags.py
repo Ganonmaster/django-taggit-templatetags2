@@ -1,14 +1,14 @@
+from classytags.arguments import Argument
+from classytags.core import Options
+from classytags.helpers import AsTag
 from django import template
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Count
 from django.core.exceptions import FieldError
-
-from classytags.core import Options
-from classytags.arguments import Argument
-from classytags.helpers import AsTag
+from django.db.models import Count
 
 from taggit_templatetags2 import settings
 from taggit_templatetags2.compat import get_model
+
 
 T_MAX = getattr(settings, 'TAGCLOUD_MAX', 6.0)
 T_MIN = getattr(settings, 'TAGCLOUD_MIN', 1.0)
@@ -112,7 +112,13 @@ class GetTagForObject(AsTag):
 
         tag_model = settings.TAG_MODEL
         app_label = source_object._meta.app_label
-        model = source_object._meta.model_name
+        try:
+            model = source_object._meta.model_name
+        except AttributeError:
+            print(dir(source_object._meta), source_object._meta.object_name,
+                  source_object._meta.module_name)
+
+            model = source_object._meta.module_name.lower()
         content_type = ContentType.objects.get(app_label=app_label,
                                                model=model)
 

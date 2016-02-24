@@ -1,5 +1,7 @@
 from django.conf import settings
+
 from taggit_templatetags2.compat import get_model
+
 
 # define the minimal weight of a tag in the tagcloud
 TAGCLOUD_MIN = getattr(settings, 'TAGGIT_TAGCLOUD_MIN', 1.0)
