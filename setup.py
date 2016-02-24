@@ -31,7 +31,7 @@ setup(
     author_email='fizista@gmail.com',
     url='https://github.com/fizista/django-taggit-templatetags2',
     license='BSD',
-    packages=find_packages(),
+    packages=find_packages(exclude=['testing*', ]),
     include_package_data=True,
     #     package_data={
     # If any package contains *.txt or *.rst files, include them:
