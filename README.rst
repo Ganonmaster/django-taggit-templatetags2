@@ -43,7 +43,7 @@ Tagdetail
 
 List of tags for the selected object::
 
-   {% get_tags_for_object <some_model_object or id> as "tags" %}
+   {% get_tags_for_object <some_model_object> as "tags" %}
 
 --------
 Taglists

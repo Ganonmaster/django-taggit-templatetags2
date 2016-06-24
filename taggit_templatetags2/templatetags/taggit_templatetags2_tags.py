@@ -104,7 +104,7 @@ class GetTagForObject(AsTag):
     def get_value(self, context, source_object, varname=''):
         """
         Args:
-            source_object - <int> or <django model object>
+            source_object - <django model object>
 
         Return:
             queryset tags
@@ -112,13 +112,12 @@ class GetTagForObject(AsTag):
 
         tag_model = settings.TAG_MODEL
         app_label = source_object._meta.app_label
+
         try:
             model = source_object._meta.model_name
         except AttributeError:
-            print(dir(source_object._meta), source_object._meta.object_name,
-                  source_object._meta.module_name)
-
             model = source_object._meta.module_name.lower()
+
         content_type = ContentType.objects.get(app_label=app_label,
                                                model=model)
 
