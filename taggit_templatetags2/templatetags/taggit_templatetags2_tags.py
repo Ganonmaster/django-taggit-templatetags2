@@ -127,7 +127,7 @@ class GetTagForObject(AsTag):
                 taggit_taggeditem_items__content_type=content_type)
         except:
             tags = tag_model.objects.filter(
-                taggit_taggeditem_items__object_id=source_object.id,
+                taggit_taggeditem_items__object_id=source_object.pk,
                 taggit_taggeditem_items__content_type=content_type)
 
         if varname:
