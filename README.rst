@@ -6,9 +6,9 @@ This is a reusable django app which adds some templatetags to django-taggit_.
 
 This is a fork the application "django-taggit-templatetags".
 
-django-taggit-templatetags2 requires Django 1.5 or greater.
+django-taggit-templatetags2 requires Django 1.6 or greater.
 
-The application works well under python 3.x
+The application works well under python 2.7 and 3.x
 
 Installation
 ============
