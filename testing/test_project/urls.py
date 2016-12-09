@@ -1,21 +1,13 @@
 import os
-try:
-    from django.conf.urls import patterns, include, url
-except ImportError:
-    # Dajngo 1.9
-    from django.conf.urls import include, url
-
-    def patterns(*args):
-        return args[1:]
+from django.conf.urls import include, url
 
 
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^admin/', include(admin.site.urls), name='admin'),
-)
+]
 
 if "DJANGO_SETTINGS_MODULE" in os.environ:
     from django.conf import settings
