@@ -157,7 +157,20 @@ Or you can use the default view, and then you have to add the following things:
 - override template "taggit_templatetags2/tagcanvas_list_item.html" to customize the look
 
 To use this inclusion-tag, make sure that 'django.core.context_processors.static'
-appears somewhere in your TEMPLATE_CONTEXT_PROCESSORS setting.
+appears somewhere in your 'context_processors' settings in your settings.py::
+
+   TEMPLATES = [
+     {
+         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+         ...
+         'OPTIONS': {
+             'context_processors': [
+                 ...
+               'django.core.context_processors.static',
+             ]
+     }
+   ]
+
 
 
 
